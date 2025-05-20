@@ -1,0 +1,2134 @@
+local customIconUrl = "https://raw.githubusercontent.com/notmys/utopia/refs/heads/main/vy_1.png"
+local customFolder = "Utopia_Build_Assets"
+local customIconFileName = "vy_1.png"
+local customIconPath = customFolder .. "/" .. customIconFileName
+
+local HttpService = game:GetService("HttpService")
+
+local function fileExists(path)
+    local success, _ = pcall(function()
+        return readfile(path)
+    end)
+    return success
+end
+
+local function ensureFolder(path)
+    local parts = string.split(path, "/")
+    local fullPath = ""
+    for _, part in ipairs(parts) do
+        fullPath = fullPath == "" and part or fullPath .. "/" .. part
+        if not isfolder(fullPath) then
+            makefolder(fullPath)
+        end
+    end
+end
+
+local function fetchAndSaveCustomIcon()
+    local urlWithTimestamp = customIconUrl .. "?t=" .. tostring(os.time())
+
+    local success, imageData = pcall(function()
+        return game:HttpGet(urlWithTimestamp, true)
+    end)
+
+    if success and imageData then
+        ensureFolder(customFolder)
+
+        if fileExists(customIconPath) then
+            pcall(function() delfile(customIconPath) end)
+        end
+
+        writefile(customIconPath, imageData)
+        return true
+    else
+        warn("Failed to fetch custom icon: " .. tostring(imageData or "Unknown error"))
+        return false
+    end
+end
+
+local function showCustomIcon()
+    local fetched = fetchAndSaveCustomIcon()
+    if not fetched then return end
+
+    local assetPath = getcustomasset(customIconPath)
+    if assetPath then
+        local coreGui = game:GetService("CoreGui")
+
+        local oldGui = coreGui:FindFirstChild("TempIconDisplay")
+        if oldGui then
+            oldGui:Destroy()
+        end
+
+        local gui = Instance.new("ScreenGui")
+        gui.Name = "TempIconDisplay"
+        gui.ResetOnSpawn = false
+        gui.IgnoreGuiInset = true
+        gui.Parent = coreGui
+
+        local imageLabel = Instance.new("ImageLabel")
+        imageLabel.Size = UDim2.new(0, 800, 0, 400)
+        imageLabel.Position = UDim2.new(0.5, -440, 0.5, -200)  
+        imageLabel.BackgroundTransparency = 1
+        imageLabel.Image = assetPath
+        imageLabel.Parent = gui
+
+        task.delay(2, function()
+            if gui and gui.Parent then
+                gui:Destroy()
+            end
+        end)
+    else
+        warn("Failed to load custom icon from asset")
+    end
+end
+
+showCustomIcon()
+
+wait(3)
+
+local defaultServices = {
+    'Workspace',
+    'GuiService',
+    'Stats',
+    'TimerService',
+    'SoundService',
+    'VideoCaptureService',
+    'LogService',
+    'ContentProvider',
+    'KeyframeSequenceProvider',
+    'AnimationClipProvider',
+    'Chat',
+    'MarketplaceService',
+    'Players',
+    'PointsService',
+    'NotificationService',
+    'ReplicatedFirst',
+    'HttpRbxApiService',
+    'TweenService',
+    'MaterialService',
+    'TextChatService',
+    'TextService',
+    'PlayerEmulatorService',
+    'CorePackages',
+    'StudioData',
+    'SharedTableRegistry',
+    'StarterPlayer',
+    'StarterPack',
+    'StarterGui',
+    'CoreGui',
+    'LocalizationService',
+    'PolicyService',
+    'JointsService',
+    'CollectionService',
+    'PhysicsService',
+    'BadgeService',
+    'GeometryService',
+    'FriendService',
+    'InsertService',
+    'GamePassService',
+    'Debris',
+    'CookiesService',
+    'Selection',
+    'UserInputService',
+    'KeyboardService',
+    'MouseService',
+    'VRService',
+    'ContextActionService',
+    'ScriptService',
+    'ScriptContext',
+    'AssetService',
+    'TouchInputService',
+    'BrowserService',
+    'CaptureService',
+    'AppStorageService',
+    'AnalyticsService',
+    'HeatmapService',
+    'RbxAnalyticsService',
+    'HttpService',
+    'Lighting',
+    'ThirdPartyUserService',
+    'PlatformFriendsService',
+    'PlatformCloudStorageService',
+    'GenericChallengeService',
+    'ScriptRegistrationService',
+    'RuntimeScriptService',
+    'RobloxReplicatedStorage',
+    'MessageBusService',
+    'MemStorageService',
+    'IXPService',
+    'ChangeHistoryService',
+    'ExperienceStateCaptureService',
+    'GamepadService',
+    'MeshContentProvider',
+    'SolidModelContentProvider',
+    'HSRDataContentProvider',
+    'VideoService',
+    'TextBoxService',
+    'ControllerService',
+    'EventIngestService',
+    'WebViewService',
+    'LinkingService',
+    'HapticService',
+    'UIDragDetectorService',
+    'NetworkClient',
+    'VoiceChatService',
+    'Visit',
+    'GuidRegistryService',
+    'PermissionsService',
+    'Teams',
+    'FeatureRestrictionManager',
+    'ExperienceAuthService',
+    'CommerceService',
+    'ReplicatedStorage',
+    'TestService',
+    'AdService',
+    'SocialService',
+    'SafetyService',
+    'ProximityPromptService',
+    'AvatarChatService',
+    'FacialAnimationStreamingServiceV2',
+    'AvatarCreationService',
+    'GenerationService',
+    'RobloxServerStorage',
+    'ScriptProfilerService',
+    'HeapProfilerService',
+    'TelemetryService',
+    'SessionService',
+    'ExperienceService',
+    'AudioFocusService',
+    'UserService',
+    'FaceAnimatorService',
+    'GroupService',
+    'Instance',
+    'AccountService',
+    'OmniRecommendationsService',
+    'DataModelPatchService',
+    'MessagingService',
+    'AvatarEditorService',
+    'AppUpdateService',
+    'CreatorStoreService',
+    'RtMessagingService',
+    'ExperienceNotificationService',
+    'AchievementService',
+    'PlayerViewService',
+    'SpawnerService',
+    'VoiceChatInternal',
+}
+
+
+local awpServices = {
+    'Workspace',
+    'GuiService',
+    'Stats',
+    'TimerService',
+    'SoundService',
+    'VideoCaptureService',
+    'LogService',
+    'ContentProvider',
+    'KeyframeSequenceProvider',
+    'AnimationClipProvider',
+    'Chat',
+    'MarketplaceService',
+    'Players',
+    'PointsService',
+    'NotificationService',
+    'ReplicatedFirst',
+    'HttpRbxApiService',
+    'TweenService',
+    'MaterialService',
+    'TextChatService',
+    'TextService',
+    'PlayerEmulatorService',
+    'CorePackages',
+    'StudioData',
+    'SharedTableRegistry',
+    'StarterPlayer',
+    'StarterPack',
+    'StarterGui',
+    'CoreGui',
+    'LocalizationService',
+    'PolicyService',
+    'JointsService',
+    'CollectionService',
+    'PhysicsService',
+    'BadgeService',
+    'GeometryService',
+    'FriendService',
+    'InsertService',
+    'GamePassService',
+    'Debris',
+    'CookiesService',
+    'Selection',
+    'UserInputService',
+    'KeyboardService',
+    'MouseService',
+    'VRService',
+    'ContextActionService',
+    'ScriptService',
+    'ScriptContext',
+    'AssetService',
+    'TouchInputService',
+    'BrowserService',
+    'CaptureService',
+    'AppStorageService',
+    'AnalyticsService',
+    'HeatmapService',
+    'RbxAnalyticsService',
+    'HttpService',
+    'Lighting',
+    'ThirdPartyUserService',
+    'PlatformFriendsService',
+    'PlatformCloudStorageService',
+    'GenericChallengeService',
+    'ScriptRegistrationService',
+    'RuntimeScriptService',
+    'RobloxReplicatedStorage',
+    'MessageBusService',
+    'MemStorageService',
+    'IXPService',
+    'ChangeHistoryService',
+    'ExperienceStateCaptureService',
+    'GamepadService',
+    'MeshContentProvider',
+    'SolidModelContentProvider',
+    'HSRDataContentProvider',
+    'VideoService',
+    'TextBoxService',
+    'ControllerService',
+    'EventIngestService',
+    'WebViewService',
+    'LinkingService',
+    'HapticService',
+    'UIDragDetectorService',
+    'NetworkClient',
+    'VoiceChatService',
+    'Visit',
+    'GuidRegistryService',
+    'PermissionsService',
+    'Teams',
+    'FeatureRestrictionManager',
+    'ExperienceAuthService',
+    'CommerceService',
+    'ReplicatedStorage',
+    'TestService',
+    'AdService',
+    'SocialService',
+    'SafetyService',
+    'ProximityPromptService',
+    'AvatarChatService',
+    'FacialAnimationStreamingServiceV2',
+    'AvatarCreationService',
+    'GenerationService',
+    'RobloxServerStorage',
+    'ScriptProfilerService',
+    'HeapProfilerService',
+    'TelemetryService',
+    'SessionService',
+    'ExperienceService',
+    'AudioFocusService',
+    'UserService',
+    'FaceAnimatorService',
+    'GroupService',
+    'Instance',
+    'AccountService',
+    'OmniRecommendationsService',
+    'DataModelPatchService',
+    'MessagingService',
+    'AvatarEditorService',
+    'AppUpdateService',
+    'CreatorStoreService',
+    'RtMessagingService',
+    'ExperienceNotificationService',
+    'AchievementService',
+    'PlayerViewService',
+    'SpawnerService',
+    'VoiceChatInternal',
+    'RunService'
+}
+
+local function getExecutorName()
+    if identifyexecutor then
+        local name = identifyexecutor()
+        if type(name) == "string" then
+            return name
+        end
+    end
+
+    if _G.executorName and type(_G.executorName) == "string" then
+        return _G.executorName
+    end
+
+    if executor then
+        if type(executor) == "string" then
+            return executor
+        elseif type(executor) == "function" then
+            local success, result = pcall(executor)
+            if success and type(result) == "string" then
+                return result
+            end
+        end
+    end
+
+    return "Unknown"
+end
+
+local executorName = getExecutorName()
+print("[INFO] Executor detected: "..executorName)
+
+local function stringContains(str, pattern)
+    return string.find(string.lower(str), string.lower(pattern)) ~= nil
+end
+
+local services = defaultServices
+if stringContains(executorName, "awp") then
+    print("[INFO] Using AWP special services list")
+    services = awpServices
+else
+    print("[INFO] Using default services list")
+end
+
+for _, serviceName in ipairs(services) do
+    getgenv()[serviceName] = game:GetService(serviceName)
+end
+
+if getconnections then
+    local cloneref = cloneref or function(x) return x end
+
+    if cloneref then
+        for _, conn in pairs(getconnections(cloneref(LogService).MessageOut)) do
+            conn:Disable()
+        end
+        for _, conn in pairs(getconnections(cloneref(ScriptContext).Error)) do
+            conn:Disable()
+        end
+    else
+        for _, conn in pairs(getconnections(LogService).MessageOut) do
+            conn:Disable()
+        end
+        for _, conn in pairs(getconnections(ScriptContext).Error) do
+            conn:Disable()
+        end
+    end
+
+    if cloneref then
+        for _, v in pairs(getconnections(cloneref(game:GetService("LogService")).MessageOut)) do
+            v:Disable()
+        end
+        for _, v in pairs(getconnections(cloneref(game:GetService("ScriptContext")).Error)) do
+            v:Disable()
+        end
+    else
+        for _, v in pairs(getconnections(game:GetService("LogService")).MessageOut) do
+            v:Disable()
+        end
+        for _, v in pairs(getconnections(game:GetService("ScriptContext")).Error) do
+            v:Disable()
+        end
+    end
+
+    warn("[utopia.voyage UI LIBRARY] DISCONNECTED ALL CONSOLE CONNECTIONS!")
+end
+
+local SoundService = game:GetService("SoundService")
+local Players = game:GetService("Players")
+
+local introUrl = "https://github.com/notmys/main/raw/refs/heads/main/intro/utopia.voyage.mp3"
+local introFolder = "sounds_utopia"
+local introFileName = "utopia.voyage.mp3"  
+local introFilePath = introFolder .. "/" .. introFileName
+
+local function fileExists(path)
+    return pcall(function()
+        readfile(path)
+    end)
+end
+
+local function ensureFolder()
+    if not isfolder(introFolder) then
+        makefolder(introFolder)
+    end
+end
+
+local function fetchAndSaveIntro()
+    ensureFolder()
+    local success, data = pcall(function()
+        return game:HttpGet(introUrl)
+    end)
+
+    if success and data then
+        writefile(introFilePath, data)
+        return true
+    else
+        warn("Failed to fetch intro audio: " .. (data or "Unknown error"))
+        return false
+    end
+end
+
+local function playIntroSound(screenGui)
+    if not fileExists(introFilePath) then
+        local ok = fetchAndSaveIntro()
+        if not ok then return end
+    end
+
+    local success, assetPath = pcall(function()
+        return getcustomasset(introFilePath)
+    end)
+
+    if not success then
+        warn("Failed to create custom asset from path: " .. introFilePath)
+        return
+    end
+
+    local sound = Instance.new("Sound")
+    sound.SoundId = assetPath
+    sound.Volume = 0.5
+    sound.Name = "IntroSound"
+    sound.Parent = screenGui
+
+    local ok, err = pcall(function()
+        SoundService:PlayLocalSound(sound)
+    end)
+
+    if not ok then
+        warn("Sound playback error: " .. err)
+    end
+
+    sound.Ended:Connect(function()
+        sound:Destroy()
+    end)
+end
+
+local function initAndPlay()
+    local player = Players.LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui")
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "SoundGui"
+    gui.Parent = playerGui
+
+    playIntroSound(gui)
+end
+
+initAndPlay()
+
+wait(1)
+
+local NotificationLib = {}
+
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
+
+
+local screenGui = CoreGui:FindFirstChild("NotificationUI")
+if not screenGui then
+    screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "NotificationUI"
+    screenGui.IgnoreGuiInset = true
+    screenGui.ResetOnSpawn = false
+    screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    screenGui.Parent = CoreGui
+end
+
+local container = screenGui:FindFirstChild("NotificationContainer")
+if not container then
+    container = Instance.new("Frame")
+    container.AnchorPoint = Vector2.new(1, 1)
+    container.Position = UDim2.new(1, -20, 1, -20)
+    container.Size = UDim2.new(0, 350, 1, -40)
+    container.BackgroundTransparency = 1
+    container.Name = "NotificationContainer"
+    container.Parent = screenGui
+
+    local layout = Instance.new("UIListLayout")
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Padding = UDim.new(0, 10)
+    layout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+    layout.Parent = container
+end
+
+local notificationCount = 0
+
+local function fadeAndFoldOut(instance, duration)
+    for _, obj in ipairs(instance:GetDescendants()) do
+        if obj:IsA("TextLabel") or obj:IsA("TextButton") then
+            TweenService:Create(obj, TweenInfo.new(duration), {TextTransparency = 1, BackgroundTransparency = 1}):Play()
+        elseif obj:IsA("ImageLabel") or obj:IsA("ImageButton") then
+            TweenService:Create(obj, TweenInfo.new(duration), {ImageTransparency = 1}):Play()
+        elseif obj:IsA("Frame") then
+            TweenService:Create(obj, TweenInfo.new(duration), {BackgroundTransparency = 1}):Play()
+        end
+    end
+
+    TweenService:Create(instance, TweenInfo.new(duration), {
+        Size = UDim2.new(1, 0, 0, 0),
+    }):Play()
+
+    TweenService:Create(instance, TweenInfo.new(duration), {
+        Position = instance.Position + UDim2.new(0, 0, 0, -10),
+    }):Play()
+end
+
+function NotificationLib.Notify(options)
+    local Title = options.Title or "Notification"
+    local Content = options.Content or ""
+    local Duration = options.Duration or 5
+
+    local ShowButton1 = options.Button1 or false
+    local Button1Text = options.Button1Text or "OK"
+    local Button1Callback = options.Button1Callback or function() end
+
+    local ShowButton2 = options.Button2 or false
+    local Button2Text = options.Button2Text or "Cancel"
+    local Button2Callback = options.Button2Callback or function() end
+
+    local hasButtons = ShowButton1 or ShowButton2
+    local fullHeight = hasButtons and 130 or 90
+
+    notificationCount = notificationCount + 1
+
+    local notif = Instance.new("Frame")
+    notif.Size = UDim2.new(1, 0, 0, 0)
+    notif.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+    notif.BorderSizePixel = 0
+    notif.BackgroundTransparency = 0
+    notif.ClipsDescendants = true
+    notif.LayoutOrder = -notificationCount
+    notif.AnchorPoint = Vector2.new(0, 1)
+    notif.Position = UDim2.new(0, 0, 1, 0)
+    notif.Parent = container
+    Instance.new("UICorner", notif).CornerRadius = UDim.new(0, 8)
+
+    
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, -20, 0, 20)
+    title.Position = UDim2.new(0, 10, 0, 10)
+    title.BackgroundTransparency = 1
+    title.Font = Enum.Font.GothamBold
+    title.Text = Title
+    title.TextColor3 = Color3.new(1, 1, 1)
+    title.TextSize = 16
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.TextTransparency = 1
+    title.Parent = notif
+
+    
+    local content = Instance.new("TextLabel")
+    content.Size = UDim2.new(1, -20, 0, 40)
+    content.Position = UDim2.new(0, 10, 0, 35)
+    content.BackgroundTransparency = 1
+    content.Font = Enum.Font.Gotham
+    content.Text = Content
+    content.TextColor3 = Color3.fromRGB(200, 200, 200)
+    content.TextSize = 14
+    content.TextWrapped = true
+    content.TextXAlignment = Enum.TextXAlignment.Left
+    content.TextYAlignment = Enum.TextYAlignment.Top
+    content.TextTransparency = 1
+    content.Parent = notif
+
+    
+    if hasButtons then
+        local buttonFrame = Instance.new("Frame")
+        buttonFrame.Size = UDim2.new(1, -20, 0, 30)
+        buttonFrame.Position = UDim2.new(0, 10, 1, -40)
+        buttonFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+        buttonFrame.BackgroundTransparency = 1
+        buttonFrame.Parent = notif
+
+        local uiStroke = Instance.new("UIStroke")
+        uiStroke.Color = Color3.fromRGB(30, 30, 35)
+        uiStroke.Thickness = 2
+        uiStroke.Parent = buttonFrame
+
+        local buttonLayout = Instance.new("UIListLayout")
+        buttonLayout.FillDirection = Enum.FillDirection.Horizontal
+        buttonLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        buttonLayout.Padding = UDim.new(0, 10)
+        buttonLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+        buttonLayout.Parent = buttonFrame
+
+        if ShowButton2 then
+            local button2 = Instance.new("TextButton")
+            button2.Size = UDim2.new(0, 100, 1, 0)
+            button2.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+            button2.Text = Button2Text
+            button2.Font = Enum.Font.GothamMedium
+            button2.TextColor3 = Color3.new(1, 1, 1)
+            button2.TextSize = 14
+            button2.AutoButtonColor = false
+            button2.TextTransparency = 1
+            button2.BackgroundTransparency = 0
+            button2.Parent = buttonFrame
+
+            Instance.new("UICorner", button2).CornerRadius = UDim.new(0, 6)
+
+            button2.MouseButton1Click:Connect(function()
+                Button2Callback()
+                fadeAndFoldOut(notif, 0.3)
+                task.wait(0.35)
+                notif:Destroy()
+            end)
+        end
+
+        if ShowButton1 then
+            local button1 = Instance.new("TextButton")
+            button1.Size = UDim2.new(0, 100, 1, 0)
+            button1.BackgroundColor3 = Color3.fromRGB(60, 120, 255)
+            button1.Text = Button1Text
+            button1.Font = Enum.Font.GothamMedium
+            button1.TextColor3 = Color3.new(1, 1, 1)
+            button1.TextSize = 14
+            button1.AutoButtonColor = false
+            button1.TextTransparency = 1
+            button1.BackgroundTransparency = 0
+            button1.Parent = buttonFrame
+
+            Instance.new("UICorner", button1).CornerRadius = UDim.new(0, 6)
+
+            button1.MouseButton1Click:Connect(function()
+                Button1Callback()
+                fadeAndFoldOut(notif, 0.3)
+                task.wait(0.35)
+                notif:Destroy()
+            end)
+        end
+    end
+
+    
+    task.wait()
+    TweenService:Create(notif, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {
+        Size = UDim2.new(1, 0, 0, fullHeight),
+    }):Play()
+
+    for _, obj in ipairs(notif:GetDescendants()) do
+        if obj:IsA("TextLabel") then
+            TweenService:Create(obj, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
+        elseif obj:IsA("TextButton") then
+            TweenService:Create(obj, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
+        elseif obj:IsA("Frame") then
+            TweenService:Create(obj, TweenInfo.new(0.4), {BackgroundTransparency = 0}):Play()
+        end
+    end
+
+    
+    if not hasButtons then
+        task.delay(Duration, function()
+            if notif and notif.Parent then
+                fadeAndFoldOut(notif, 0.3)
+                task.wait(0.35)
+                notif:Destroy()
+            end
+        end)
+    end
+end
+
+_G.NotificationLib = NotificationLib
+
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+
+local Window = {}
+Window.__index = Window
+
+local Themes = {
+    Dark = {
+        Background = Color3.fromRGB(40, 40, 40),
+        TopBar = Color3.fromRGB(25, 25, 25),
+        TabBar = Color3.fromRGB(30, 30, 30),
+        Button = Color3.fromRGB(70, 70, 70),
+        ToggleOn = Color3.fromRGB(0, 170, 0),
+        ToggleOff = Color3.fromRGB(120, 120, 120),
+        Text = Color3.new(1, 1, 1)
+    },
+    Light = {
+        Background = Color3.fromRGB(245, 245, 245),
+        TopBar = Color3.fromRGB(220, 220, 220),
+        TabBar = Color3.fromRGB(230, 230, 230),
+        Button = Color3.fromRGB(255, 255, 255),
+        ToggleOn = Color3.fromRGB(0, 170, 0),
+        ToggleOff = Color3.fromRGB(180, 180, 180),
+        Text = Color3.new(0, 0, 0)
+    },
+    Purple = {
+        Background = Color3.fromRGB(70, 50, 100),
+        TopBar = Color3.fromRGB(60, 40, 90),
+        TabBar = Color3.fromRGB(80, 60, 110),
+        Button = Color3.fromRGB(100, 80, 130),
+        ToggleOn = Color3.fromRGB(170, 100, 255),
+        ToggleOff = Color3.fromRGB(90, 70, 120),
+        Text = Color3.new(1, 1, 1)
+    },
+        Blue = {
+        Background = Color3.fromRGB(0, 62, 125),
+        TopBar = Color3.fromRGB(0, 77, 153),
+        TabBar = Color3.fromRGB(0, 77, 153),
+        Button = Color3.fromRGB(0, 45, 89),
+        ToggleOn = Color3.fromRGB(0, 170, 0),
+        ToggleOff = Color3.fromRGB(180, 180, 180),
+        Text = Color3.new(0, 0, 0)
+    },
+}
+
+local function destroyExistingUI()
+    local parents = { CoreGui }
+    if gethui then
+        table.insert(parents, gethui())
+    end
+   
+
+    for _, parent in ipairs(parents) do
+        for _, existingUI in ipairs(parent:GetChildren()) do
+            if existingUI.Name == "utopia.voyage" then
+                existingUI:Destroy()
+            end
+        end
+    end
+end
+
+local currentWindow = nil
+
+function Window.new(size)
+    destroyExistingUI()
+   
+    if currentWindow and currentWindow.ScreenGui then
+        currentWindow.ScreenGui:Destroy()
+        currentWindow = nil
+    end
+   
+    local self = setmetatable({}, Window)
+
+    self.WindowSize = size or Vector2.new(600, 400)
+    self.GlowSize = 8
+    self.TabBarWidth = 50
+    self.Tabs = {}
+
+
+local CoreGui = game:GetService("CoreGui")
+
+
+local function CreateInstance(className, properties)
+    local instance = Instance.new(className)
+    for property, value in pairs(properties) do
+        local success, errorMsg = pcall(function()
+            instance[property] = value
+        end)
+
+        if not success then
+            if property == "Text" and typeof(value) ~= "string" then
+                instance[property] = tostring(value)
+            elseif errorMsg:find("Tex") then
+                if typeof(value) ~= "string" then
+                    instance.Text = tostring(value)
+                end
+            else
+                warn("Error setting property " .. property .. " on " .. className .. ": " .. errorMsg)
+            end
+        end
+    end
+    return instance
+end
+
+
+local ScreenGui = CreateInstance("ScreenGui", {
+    Name = "utopia.voyage",
+    ResetOnSpawn = false,
+    IgnoreGuiInset = true,
+    DisplayOrder = 999999999,
+    Parent = gethui and gethui() or CoreGui
+})
+
+
+if gethui then
+    ScreenGui.Parent = gethui()
+end
+
+   
+    self.Frame = Instance.new("Frame")
+    self.Frame.Name = "MainFrame"
+    self.Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    self.Frame.BorderSizePixel = 0
+    self.Frame.Active = false
+    self.ScreenGui = ScreenGui
+    self.Frame.Parent = self.ScreenGui
+
+    local FrameCorner = Instance.new("UICorner")
+    FrameCorner.CornerRadius = UDim.new(0, 6)
+    FrameCorner.Parent = self.Frame
+
+   
+    self.Glow = Instance.new("ImageLabel")
+    self.Glow.Name = "Glow"
+    self.Glow.BackgroundTransparency = 1
+    self.Glow.Image = "rbxassetid://1316045217"
+    self.Glow.ImageColor3 = Color3.new(0, 0, 0)
+    self.Glow.ScaleType = Enum.ScaleType.Slice
+    self.Glow.SliceCenter = Rect.new(10, 10, 118, 118)
+    self.Glow.ZIndex = 0
+    self.Glow.Parent = self.Frame
+
+   
+    self.TopBar = Instance.new("Frame")
+    self.TopBar.Name = "TopBar"
+    self.TopBar.Size = UDim2.new(1, 0, 0, 30)
+    self.TopBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    self.TopBar.BorderSizePixel = 0
+    self.TopBar.Parent = self.Frame
+
+    local TopBarCorner = Instance.new("UICorner")
+    TopBarCorner.CornerRadius = UDim.new(0, 0)
+    TopBarCorner.Parent = self.TopBar
+
+local VoiceChatInternal = game:GetService("VoiceChatInternal")
+local VoiceChatService = game:GetService("VoiceChatService")
+local TweenService = game:GetService("TweenService")
+
+local TweenService = game:GetService("TweenService")
+
+self.MicToggle = Instance.new("TextButton")
+self.MicToggle.Name = "MicToggle"
+self.MicToggle.Size = UDim2.new(0, 40, 0, 24)
+self.MicToggle.Position = UDim2.new(1, -100, 0, 3)
+self.MicToggle.BackgroundTransparency = 1
+self.MicToggle.TextTransparency = 1 
+self.MicToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+self.MicToggle.Text = "🔊"
+self.MicToggle.Font = Enum.Font.SourceSans
+self.MicToggle.TextSize = 20
+self.MicToggle.Parent = self.TopBar
+
+
+task.delay(1.4, function()
+    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local goals = {
+        TextTransparency = 0
+    }
+    local tween = TweenService:Create(self.MicToggle, tweenInfo, goals)
+    tween:Play()
+end)
+
+local isMuted = false
+
+local function updateMicToggleIcon(muted)
+    if muted then
+        self.MicToggle.Text = "🔇"
+        isMuted = true
+    else
+        self.MicToggle.Text = "🔊"
+        isMuted = false
+    end
+end
+
+VoiceChatInternal.StateChanged:Connect(function(_, newState)
+    if newState == Enum.VoiceChatState.Ended then
+        updateMicToggleIcon(true)  
+    elseif newState == Enum.VoiceChatState.Connected then
+        updateMicToggleIcon(false) 
+    end
+end)
+
+
+self.MicToggle.MouseButton1Click:Connect(function()
+    if isMuted then
+        VoiceChatService:joinVoice()
+        updateMicToggleIcon(false)
+    else
+        VoiceChatInternal:Leave()
+        updateMicToggleIcon(true)
+    end
+end)
+
+function updateMicButtonPosition(showSearch)
+    local targetX = showSearch and -305 or -100
+    local tween = TweenService:Create(
+        self.MicToggle,
+        TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        { Position = UDim2.new(1, targetX, 0, 3) }
+    )
+    tween:Play()
+end
+
+
+self.AnalyticsToggle = Instance.new("TextButton")
+self.AnalyticsToggle.Name = "AnalyticsToggle"
+self.AnalyticsToggle.Size = UDim2.new(0, 40, 0, 24)
+
+local TweenService = game:GetService("TweenService")
+
+self.AnalyticsToggle = Instance.new("TextButton")
+self.AnalyticsToggle.Name = "AnalyticsToggle"
+self.AnalyticsToggle.Size = UDim2.new(0, 40, 0, 24)
+self.AnalyticsToggle.Position = UDim2.new(1, -130, 0, 3)
+self.AnalyticsToggle.BackgroundTransparency = 1
+self.AnalyticsToggle.TextTransparency = 1 
+self.AnalyticsToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+self.AnalyticsToggle.Text = "📊"  
+self.AnalyticsToggle.Font = Enum.Font.SourceSans
+self.AnalyticsToggle.TextSize = 20
+self.AnalyticsToggle.Parent = self.TopBar
+
+
+task.delay(1.4, function()
+    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local goals = {
+        TextTransparency = 0
+    }
+    local tween = TweenService:Create(self.AnalyticsToggle, tweenInfo, goals)
+    tween:Play()
+end)
+
+local analyticsEnabled = false
+self.AnalyticsToggle.MouseButton1Click:Connect(function()
+    analyticsEnabled = not analyticsEnabled
+    if analyticsEnabled then
+        self.AnalyticsToggle.TextColor3 = Color3.fromRGB(0, 255, 0) 
+
+    else
+        self.AnalyticsToggle.TextColor3 = Color3.fromRGB(255, 255, 255) 
+
+    end
+end)
+
+function updateMicButtonPosition(showSearch)
+    local micTargetX = showSearch and -305 or -100
+    local analyticsTargetX = showSearch and -330 or -130 
+
+    local micTween = TweenService:Create(
+        self.MicToggle,
+        TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        { Position = UDim2.new(1, micTargetX, 0, 3) }
+    )
+    micTween:Play()
+
+    local analyticsTween = TweenService:Create(
+        self.AnalyticsToggle,
+        TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        { Position = UDim2.new(1, analyticsTargetX, 0, 3) }
+    )
+    analyticsTween:Play()
+end
+
+    local TweenService = game:GetService("TweenService")
+    local TextService = game:GetService("TextService")
+local TweenService = game:GetService("TweenService")
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Name = "TitleLabel"
+titleLabel.Size = UDim2.new(0, 200, 1, 0)
+titleLabel.Position = UDim2.new(0, 10, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.TextTransparency = 1 
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.Font = Enum.Font.Code
+titleLabel.TextSize = 18
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Text = "utopia.voyage | BETA UI LIBRARY"
+titleLabel.Parent = self.TopBar
+
+task.delay(1, function()
+    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local goal = { TextTransparency = 0 }
+
+    local tween = TweenService:Create(titleLabel, tweenInfo, goal)
+    tween:Play()
+end)
+
+    local textBounds = TextService:GetTextSize(
+        titleLabel.Text,
+        titleLabel.TextSize,
+        titleLabel.Font,
+        Vector2.new(math.huge, math.huge)
+    )
+
+    local underline = Instance.new("Frame")
+    underline.Name = "Underline"
+    underline.AnchorPoint = Vector2.new(0.5, 1)
+    underline.Position = UDim2.new(0, titleLabel.Position.X.Offset + (textBounds.X / 2), 1, -1)
+    underline.Size = UDim2.new(0, 0, 0, 1)
+    underline.BackgroundColor3 = Color3.fromRGB(39, 160, 240)
+    underline.BorderSizePixel = 0
+    underline.Parent = self.TopBar
+
+    local tweenInfo = TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local goal = {Size = UDim2.new(0, textBounds.X, 0, 1)}
+    TweenService:Create(underline, tweenInfo, goal):Play()
+   
+local TweenService = game:GetService("TweenService")
+
+self.CloseButton = Instance.new("TextButton")
+self.CloseButton.Name = "CloseButton"
+self.CloseButton.Size = UDim2.new(0, 30, 1, 0)
+self.CloseButton.Position = UDim2.new(1, -30, 0, 0)
+self.CloseButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+self.CloseButton.BackgroundTransparency = 1
+self.CloseButton.TextTransparency = 1 
+self.CloseButton.Text = "X"
+self.CloseButton.TextColor3 = Color3.new(1, 1, 1)
+self.CloseButton.BorderSizePixel = 0
+self.CloseButton.Font = Enum.Font.SourceSansBold
+self.CloseButton.TextSize = 20
+self.CloseButton.Parent = self.TopBar
+
+
+task.delay(1.4, function()
+    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local goals = {
+        TextTransparency = 0
+    }
+    local tween = TweenService:Create(self.CloseButton, tweenInfo, goals)
+    tween:Play()
+end)
+
+    local ButtonCorner = Instance.new("UICorner")
+    ButtonCorner.CornerRadius = UDim.new(0, 8)
+    ButtonCorner.Parent = self.CloseButton
+
+    self.CloseButton.MouseButton1Click:Connect(function()
+        self.ScreenGui:Destroy()
+    end)
+
+
+local TweenService = game:GetService("TweenService")
+
+self.SearchButton = Instance.new("TextButton")
+self.SearchButton.Name = "SearchButton"
+self.SearchButton.Size = UDim2.new(0, 30, 1, 0)
+self.SearchButton.Position = UDim2.new(1, -60, 0, 0)
+self.SearchButton.BackgroundColor3 = Color3.fromRGB(100, 100, 200)
+self.SearchButton.BackgroundTransparency = 1
+self.SearchButton.TextTransparency = 1 
+self.SearchButton.Text = "🔍"
+self.SearchButton.TextColor3 = Color3.new(1, 1, 1)
+self.SearchButton.BorderSizePixel = 0
+self.SearchButton.Font = Enum.Font.SourceSansBold
+self.SearchButton.TextSize = 18
+self.SearchButton.Parent = self.TopBar
+
+
+task.delay(1.4, function()
+    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local goals = {
+        TextTransparency = 0
+    }
+    local tween = TweenService:Create(self.SearchButton, tweenInfo, goals)
+    tween:Play()
+end)
+
+    local SearchButtonCorner = Instance.new("UICorner")
+    SearchButtonCorner.CornerRadius = UDim.new(0, 8)
+    SearchButtonCorner.Parent = self.SearchButton
+
+    self.SearchBox = Instance.new("TextBox")
+    self.SearchBox.Size = UDim2.new(0, 200, 0, 28)
+    self.SearchBox.Position = UDim2.new(1, -270, 0, 1)
+    self.SearchBox.Visible = false
+    self.SearchBox.PlaceholderText = "Search.."
+    self.SearchBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    self.SearchBox.TextColor3 = Color3.new(1, 1, 1)
+    self.SearchBox.Font = Enum.Font.SourceSans
+    self.SearchBox.TextSize = 16
+    self.SearchBox.Text = ""
+    self.SearchBox.BorderSizePixel = 0
+    self.SearchBox.Parent = self.TopBar
+
+    local boxCorner = Instance.new("UICorner")
+    boxCorner.CornerRadius = UDim.new(0, 6)
+    boxCorner.Parent = self.SearchBox
+
+self.SearchButton.MouseButton1Click:Connect(function()
+    self.SearchBox.Visible = not self.SearchBox.Visible
+
+   
+    updateMicButtonPosition(self.SearchBox.Visible)
+
+    if self.SearchBox.Visible then
+        self.SearchBox:CaptureFocus()
+    else
+        self.SearchBox.Text = ""
+        self:FilterButtons("")
+    end
+end)
+
+self.SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+    self:FilterButtons(self.SearchBox.Text)
+end)
+
+function Window:FilterButtons(query)
+    local selectedTab
+    for _, tab in ipairs(self.Tabs) do
+        if tab.ScrollFrame.Visible then
+            selectedTab = tab
+            break
+        end
+    end
+    if not selectedTab then return end
+
+    query = query:lower():gsub("^%s*(.-)%s*$", "%1")
+
+    for _, btn in ipairs(selectedTab.Buttons) do
+        local match = false
+
+        if btn:IsA("TextButton") then
+            match = query == "" or btn.Text:lower():find(query, 1, true)
+            btn.Visible = match
+
+        elseif btn:IsA("Frame") then
+            local label = btn:FindFirstChildOfClass("TextLabel")
+            if label then
+                match = query == "" or label.Text:lower():find(query, 1, true)
+            else
+                match = true
+            end
+            btn.Visible = match
+        end
+    end
+end
+   
+local TweenService = game:GetService("TweenService")
+
+self.TabBar = Instance.new("Frame")
+self.TabBar.Name = "TabBar"
+self.TabBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+self.TabBar.BackgroundTransparency = 1 
+self.TabBar.Size = UDim2.new(0, self.TabBarWidth, 1, -30)
+self.TabBar.Position = UDim2.new(0, -60, 0, 30)
+self.TabBar.Parent = self.Frame
+
+for _, child in ipairs(self.TabBar:GetDescendants()) do
+    if child:IsA("TextLabel") then
+        child.TextTransparency = 1
+        local tween = TweenService:Create(child, tweenInfo, { TextTransparency = 0 })
+        tween:Play()
+    elseif child:IsA("TextButton") then
+        child.BackgroundTransparency = 1
+        child.TextTransparency = 1
+        local tween = TweenService:Create(child, tweenInfo, {
+            BackgroundTransparency = 0,
+            TextTransparency = 0
+        })
+        tween:Play()
+    elseif child:IsA("Frame") then
+        child.BackgroundTransparency = 1
+        local tween = TweenService:Create(child, tweenInfo, { BackgroundTransparency = 0 })
+        tween:Play()
+    elseif child:IsA("ImageLabel") then
+        child.ImageTransparency = 1
+        local tween = TweenService:Create(child, tweenInfo, { ImageTransparency = 0 })
+        tween:Play()
+    end
+end
+
+
+task.delay(2.0, function()
+	local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+	
+	local frameTween = TweenService:Create(self.TabBar, tweenInfo, {
+		BackgroundTransparency = 0
+	})
+	frameTween:Play()
+
+
+for _, child in ipairs(self.TabBar:GetDescendants()) do
+    if child:IsA("TextLabel") then
+        child.TextTransparency = 1
+    elseif child:IsA("Frame") then
+        child.BackgroundTransparency = 1
+    elseif child:IsA("ImageLabel") then
+        child.ImageTransparency = 1
+    end
+end
+
+
+for _, child in ipairs(self.TabBar:GetDescendants()) do
+    if child:IsA("TextLabel") then
+        local tween = TweenService:Create(child, tweenInfo, { TextTransparency = 0 })
+        tween:Play()
+    elseif child:IsA("Frame") then
+        local tween = TweenService:Create(child, tweenInfo, { BackgroundTransparency = 0 })
+        tween:Play()
+    elseif child:IsA("ImageLabel") then
+        local tween = TweenService:Create(child, tweenInfo, { ImageTransparency = 0 })
+        tween:Play()
+    end
+end
+end)
+
+    local cornerT = Instance.new("UICorner")
+    cornerT.CornerRadius = UDim.new(0, 6)
+    cornerT.Parent = self.TabBar
+
+    self.TabLayout = Instance.new("UIListLayout")
+    self.TabLayout.Parent = self.TabBar
+    self.TabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    self.TabLayout.Padding = UDim.new(0, 5)
+
+    self.ContentFrame = Instance.new("Frame")
+    self.ContentFrame.Name = "ContentFrame"
+    self.ContentFrame.BackgroundTransparency = 1
+    self.ContentFrame.Size = UDim2.new(1, -self.TabBarWidth, 1, -30)
+    self.ContentFrame.Position = UDim2.new(0, self.TabBarWidth, 0, 30)
+    self.ContentFrame.Parent = self.Frame
+
+    self.DragMode = "Normal"
+
+    self:SetupDragging()
+
+    self:UpdateWindow(self.WindowSize)
+
+    return self
+end
+
+function Window:SetupDragging()
+    local dragging = false
+    local dragInput, mousePos, framePos
+
+    local UserInputService = game:GetService("UserInputService")
+    local runService = game:GetService("RunService")
+    local targetPosition = nil
+
+    self.TopBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            UserInputService.ModalEnabled = true 
+            mousePos = input.Position
+            framePos = self.Frame.Position
+
+            if self.DragMode == "Smooth" then
+                targetPosition = framePos
+            end
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                    targetPosition = nil
+                    UserInputService.ModalEnabled = false 
+                end
+            end)
+        end
+    end)
+
+    self.TopBar.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - mousePos
+            local newPos = UDim2.new(
+                framePos.X.Scale, framePos.X.Offset + delta.X,
+                framePos.Y.Scale, framePos.Y.Offset + delta.Y
+            )
+
+            if self.DragMode == "Normal" then
+                self.Frame.Position = newPos
+            elseif self.DragMode == "Smooth" then
+                targetPosition = newPos
+            end
+        end
+    end)
+
+    runService.Heartbeat:Connect(function()
+        if self.DragMode == "Smooth" and dragging and targetPosition then
+            local current = self.Frame.Position
+            local lerpFactor = 0.1
+
+            local newX = current.X.Offset + (targetPosition.X.Offset - current.X.Offset) * lerpFactor
+            local newY = current.Y.Offset + (targetPosition.Y.Offset - current.Y.Offset) * lerpFactor
+
+            self.Frame.Position = UDim2.new(current.X.Scale, newX, current.Y.Scale, newY)
+        end
+    end)
+end
+
+function Window:SetDragMode(mode)
+    if mode == "Normal" or mode == "Smooth" then
+        self.DragMode = mode
+    else
+        warn("Invalid drag mode: " .. tostring(mode))
+    end
+end
+
+local UserInputService = game:GetService("UserInputService")
+
+function Window:UpdateWindow(size)
+    self.WindowSize = size or self.WindowSize
+    local w, h = self.WindowSize.X, self.WindowSize.Y
+
+    
+    if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then
+        w = w - 200
+        h = h - 200
+    end
+
+    self.Frame.Size = UDim2.new(0, w, 0, h)
+    self.Frame.Position = UDim2.new(0.5, -w/2, 0.5, -h/2)
+
+    self.Glow.Size = UDim2.new(0, w + self.GlowSize*2, 0, h + self.GlowSize*2)
+    self.Glow.Position = UDim2.new(0.5, -(w/2 + self.GlowSize), 0.5, -(h/2 + self.GlowSize))
+
+    self.TabBar.Size = UDim2.new(0, self.TabBarWidth, 1, -30)
+    self.ContentFrame.Size = UDim2.new(1, -self.TabBarWidth, 1, -30)
+    self.ContentFrame.Position = UDim2.new(0, self.TabBarWidth, 0, 30)
+end
+
+
+function Window:SetWindowSize(size)
+    if size and typeof(size) == "Vector2" then
+        self.WindowSize = size
+        self:UpdateWindow(self.WindowSize)
+    end
+end
+
+function Window:SetGlowSize(size)
+    if size and type(size) == "number" then
+        self.GlowSize = size
+        self:UpdateWindow(self.WindowSize)
+    end
+end
+
+function Window:SetTabBarWidth(width)
+    if width and type(width) == "number" then
+        self.TabBarWidth = width
+        self:UpdateWindow(self.WindowSize)
+    end
+end
+
+function Window:Creation(tabName)
+    local tab = {}
+    tab.Name = tabName
+    tab.Buttons = {}
+
+   
+local TweenService = game:GetService("TweenService")
+
+
+tab.Button = Instance.new("TextButton")
+tab.Button.Size = UDim2.new(1, -10, 0, 40)
+tab.Button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+tab.Button.TextColor3 = Color3.new(1, 1, 1)
+tab.Button.Font = Enum.Font.Code
+tab.Button.TextSize = 18
+tab.Button.Text = tabName
+tab.Button.BackgroundTransparency = 1       
+tab.Button.TextTransparency = 1             
+tab.Button.Parent = self.TabBar
+
+
+task.delay(2.8, function()
+    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local goals = {
+        BackgroundTransparency = 0,
+        TextTransparency = 0
+    }
+    local tween = TweenService:Create(tab.Button, tweenInfo, goals)
+    tween:Play()
+end)
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = tab.Button
+
+   
+    tab.ScrollFrame = Instance.new("ScrollingFrame")
+    tab.ScrollFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    tab.ScrollFrame.BorderSizePixel = 0
+    tab.ScrollFrame.Size = UDim2.new(1.09, 0, 1, 0)
+    tab.ScrollFrame.Position = UDim2.new(0, -50, 0, 0)
+    tab.ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    tab.ScrollFrame.ScrollBarThickness = 8
+    tab.ScrollFrame.Visible = false
+    tab.ScrollFrame.Parent = self.ContentFrame
+
+    tab.ListLayout = Instance.new("UIListLayout")
+    tab.ListLayout.Parent = tab.ScrollFrame
+    tab.ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    tab.ListLayout.Padding = UDim.new(0, 6)
+
+    tab.ListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        tab.ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, tab.ListLayout.AbsoluteContentSize.Y + 10)
+    end)
+
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+local animating = false
+
+local function getAllTextAndImageGuiObjects(root)
+    local list = {}
+    local function recurse(gui)
+        for _, child in ipairs(gui:GetChildren()) do
+            if child:IsA("TextLabel") or child:IsA("TextButton") or child:IsA("TextBox")
+            or child:IsA("ImageLabel") or child:IsA("ImageButton") then
+                table.insert(list, child)
+            end
+            recurse(child)
+        end
+    end
+    recurse(root)
+    return list
+end
+
+local function animateChildrenSequentially(parent)
+    if animating then return end
+    animating = true
+
+    local children = {}
+    for _, child in ipairs(parent:GetChildren()) do
+        if child:IsA("GuiObject") and not child:IsA("UIListLayout") then
+            table.insert(children, child)
+        end
+    end
+
+    table.sort(children, function(a, b)
+        local aOrder = a.LayoutOrder or 0
+        local bOrder = b.LayoutOrder or 0
+        if aOrder == bOrder then
+            return a:GetDebugId() < b:GetDebugId()
+        else
+            return aOrder < bOrder
+        end
+    end)
+
+    local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+    
+    for _, child in ipairs(children) do
+        local guiObjects = getAllTextAndImageGuiObjects(child)
+        for _, guiObj in ipairs(guiObjects) do
+            if guiObj:IsA("TextLabel") or guiObj:IsA("TextButton") or guiObj:IsA("TextBox") then
+                guiObj.TextTransparency = 1
+            elseif guiObj:IsA("ImageLabel") or guiObj:IsA("ImageButton") then
+                guiObj.ImageTransparency = 1
+            end
+        end
+    end
+
+    wait(0.05) 
+
+    for _, child in ipairs(children) do
+        local guiObjects = getAllTextAndImageGuiObjects(child)
+        for _, guiObj in ipairs(guiObjects) do
+            local props = {}
+            if guiObj:IsA("TextLabel") or guiObj:IsA("TextButton") or guiObj:IsA("TextBox") then
+                props.TextTransparency = 0
+            elseif guiObj:IsA("ImageLabel") or guiObj:IsA("ImageButton") then
+                props.ImageTransparency = 0
+            end
+
+            if next(props) then
+                local tween = TweenService:Create(guiObj, tweenInfo, props)
+                tween:Play()
+                tween.Completed:Wait()
+            end
+        end
+        wait(0.15)
+    end
+
+    animating = false
+end
+
+local debounceTimer = nil
+tab.ScrollFrame.ChildAdded:Connect(function()
+    if animating then return end
+    if debounceTimer then
+        debounceTimer:Disconnect()
+        debounceTimer = nil
+    end
+
+    debounceTimer = RunService.Heartbeat:Connect(function()
+        debounceTimer:Disconnect()
+        debounceTimer = nil
+        wait(0.1)
+        animateChildrenSequentially(tab.ScrollFrame)
+    end)
+end)
+
+    function tab:CreateButton(info)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, 1, 0, 40)
+        btn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+        btn.TextColor3 = Color3.new(1, 1, 1)
+        btn.Font = Enum.Font.SourceSans
+
+       
+        if info.Font and Enum.Font[info.Font] then
+            btn.Font = Enum.Font[info.Font]
+        end
+
+        btn.TextSize = 18
+        btn.Text = info.Name or "Button"
+        btn.Parent = tab.ScrollFrame
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 8)
+        corner.Parent = btn
+
+        if type(info.Callback) == "function" then
+            btn.MouseButton1Click:Connect(function()
+                info.Callback()
+            end)
+        end
+
+        table.insert(tab.Buttons, btn)
+        return btn
+    end
+
+   
+    table.insert(self.Tabs, tab)
+
+   
+    tab.Button.MouseButton1Click:Connect(function()
+        self:SelectTab(#self.Tabs)
+       
+        for i, t in ipairs(self.Tabs) do
+            if t == tab then
+                self:SelectTab(i)
+                break
+            end
+        end
+    end)
+
+   
+    if #self.Tabs == 1 then
+        self:SelectTab(1)
+    end
+
+function tab:CreateToggle(info)
+    local TweenService = game:GetService("TweenService")
+
+    local container = Instance.new("Frame")
+    container.Size = UDim2.new(1, 1, 0, 40)
+    container.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    container.BorderSizePixel = 0
+    container.Parent = tab.ScrollFrame
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = container
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -60, 1, 0)
+    label.Position = UDim2.new(0, 10, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = info.Name or "Toggle"
+    label.TextColor3 = Color3.new(1, 1, 1)
+    label.Font = Enum.Font[info.Font or "SourceSans"]
+    label.TextSize = 18
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = container
+
+    local toggleBtn = Instance.new("Frame")
+    toggleBtn.Size = UDim2.new(0, 50, 0, 25)
+    toggleBtn.Position = UDim2.new(1, -60, 0.6, -6)
+    toggleBtn.AnchorPoint = Vector2.new(0, 0.5)
+    toggleBtn.BackgroundColor3 = Color3.fromRGB(120, 120, 120)
+    toggleBtn.BorderSizePixel = 0
+    toggleBtn.ZIndex = 1
+    toggleBtn.Parent = container
+
+    local toggleBtnCorner = Instance.new("UICorner")
+    toggleBtnCorner.CornerRadius = UDim.new(1, 0)
+    toggleBtnCorner.Parent = toggleBtn
+
+    local toggleCircle = Instance.new("Frame")
+    toggleCircle.Size = UDim2.new(0, 20, 0, 20)
+    toggleCircle.Position = UDim2.new(0, 3, 0.5, 0)
+    toggleCircle.AnchorPoint = Vector2.new(0, 0.5)
+    toggleCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    toggleCircle.BorderSizePixel = 0
+    toggleCircle.ZIndex = 2
+    toggleCircle.Parent = toggleBtn
+
+    local circleCorner = Instance.new("UICorner")
+    circleCorner.CornerRadius = UDim.new(1, 0)
+    circleCorner.Parent = toggleCircle
+
+    local clickableArea = Instance.new("TextButton")
+    clickableArea.Size = UDim2.new(1, 0, 1, 0)
+    clickableArea.Position = UDim2.new(0, 0, 0, 0)
+    clickableArea.BackgroundTransparency = 1
+    clickableArea.Text = ""
+    clickableArea.ZIndex = 3
+    clickableArea.Parent = container
+
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0.0, Color3.fromRGB(173, 216, 230)), 
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(216, 191, 216)), 
+        ColorSequenceKeypoint.new(1.0, Color3.fromRGB(224, 255, 255))  
+    }
+    gradient.Rotation = 45
+
+    local state = info.CurrentValue or false
+
+    local onPosition = UDim2.new(1, -23, 0.5, 0)
+    local offPosition = UDim2.new(0, 3, 0.5, 0)
+
+    local function updateToggle(animated)
+        
+        if state then
+            toggleBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            gradient.Parent = toggleBtn
+        else
+            toggleBtn.BackgroundColor3 = Color3.fromRGB(120, 120, 120)
+            gradient.Parent = nil
+        end
+
+        local target = state and onPosition or offPosition
+        if animated then
+            TweenService:Create(toggleCircle, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                Position = target
+            }):Play()
+        else
+            toggleCircle.Position = target
+        end
+    end
+
+    updateToggle(false)
+
+    clickableArea.MouseButton1Click:Connect(function()
+        state = not state
+        updateToggle(true)
+        if typeof(info.Callback) == "function" then
+            info.Callback(state)
+        end
+    end)
+
+    table.insert(tab.Buttons, container)
+    return container
+end
+
+function tab:CreateSlider(info)
+	local UserInputService = game:GetService("UserInputService")
+	local RunService = game:GetService("RunService")
+
+	local min = info.Min or 0
+	local max = info.Max or 100
+	local value = math.clamp(info.CurrentValue or 50, min, max)
+	local callback = info.Callback
+
+	local container = Instance.new("Frame")
+	container.Size = UDim2.new(1, 1, 0, 60)
+	container.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+	container.BorderSizePixel = 0
+	container.Parent = tab.ScrollFrame
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 8)
+	corner.Parent = container
+
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(1, -80, 0, 20)
+	label.Position = UDim2.new(0, 10, 0, 5)
+	label.BackgroundTransparency = 1
+	label.Text = info.Name or "Slider"
+	label.TextColor3 = Color3.new(1, 1, 1)
+	label.Font = info.TextFont or Enum.Font.Gotham
+	label.TextSize = info.TextSize or 16
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.Parent = container
+
+	local sliderBar = Instance.new("Frame")
+	sliderBar.Size = UDim2.new(1, -20, 0, 10)
+	sliderBar.Position = UDim2.new(0, 10, 0, 35)
+	sliderBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+	sliderBar.BorderSizePixel = 0
+	sliderBar.Parent = container
+
+	local barCorner = Instance.new("UICorner")
+	barCorner.CornerRadius = UDim.new(1, 5)
+	barCorner.Parent = sliderBar
+
+	
+	local gradientBar = Instance.new("Frame")
+	gradientBar.Size = UDim2.new(1, 0, 1, 0)
+	gradientBar.Position = UDim2.new(0, 0, 0, 0)
+	gradientBar.BackgroundColor3 = Color3.fromRGB(170, 0, 255)
+	gradientBar.BorderSizePixel = 0
+	gradientBar.Parent = sliderBar
+
+	local gradient = Instance.new("UIGradient")
+	gradient.Color = ColorSequence.new{
+		ColorSequenceKeypoint.new(0.0, Color3.fromRGB(173, 216, 230)),
+		ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 255, 255)),
+		ColorSequenceKeypoint.new(0.8, Color3.fromRGB(255, 182, 193)),
+		ColorSequenceKeypoint.new(1.0, Color3.fromRGB(255, 182, 193))
+	}
+	gradient.Rotation = 0
+	gradient.Parent = gradientBar
+
+	local gradientCorner = Instance.new("UICorner")
+	gradientCorner.CornerRadius = UDim.new(1, 3)
+	gradientCorner.Parent = gradientBar
+
+	
+	local fadedOverlay = Instance.new("Frame")
+	fadedOverlay.Size = UDim2.new(1 - ((value - min) / (max - min)), 0, 1, 0)
+	fadedOverlay.Position = UDim2.new(((value - min) / (max - min)), 0, 0, 0)
+	fadedOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	fadedOverlay.BorderSizePixel = 0
+	fadedOverlay.ZIndex = 2
+	fadedOverlay.Parent = sliderBar
+
+	local fadedOverlayCorner = Instance.new("UICorner")
+	fadedOverlayCorner.CornerRadius = UDim.new(1, 5)
+	fadedOverlayCorner.Parent = fadedOverlay
+
+	local fadedGradient = Instance.new("UIGradient")
+	fadedGradient.Color = ColorSequence.new{
+		ColorSequenceKeypoint.new(0.0, Color3.fromRGB(100, 140, 170)),
+		ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 120, 140)),
+		ColorSequenceKeypoint.new(0.8, Color3.fromRGB(150, 100, 120)),
+		ColorSequenceKeypoint.new(1.0, Color3.fromRGB(150, 100, 120))
+	}
+	fadedGradient.Transparency = NumberSequence.new(0.4)
+	fadedGradient.Rotation = 0
+	fadedGradient.Parent = fadedOverlay
+
+	sliderBar.ClipsDescendants = false
+
+	
+	local rgbSequence = {
+		{time = 0.0, color = Color3.fromRGB(173, 216, 230)},
+		{time = 0.4, color = Color3.fromRGB(0, 255, 255)},
+		{time = 0.8, color = Color3.fromRGB(255, 182, 193)},
+		{time = 1.0, color = Color3.fromRGB(255, 182, 193)},
+	}
+
+	local function lerpColor(c1, c2, alpha)
+		return Color3.new(
+			c1.R + (c2.R - c1.R) * alpha,
+			c1.G + (c2.G - c1.G) * alpha,
+			c1.B + (c2.B - c1.B) * alpha
+		)
+	end
+
+	local function getColorAtTime(t)
+		for i = 1, #rgbSequence - 1 do
+			local p1, p2 = rgbSequence[i], rgbSequence[i+1]
+			if t >= p1.time and t <= p2.time then
+				local localT = (t - p1.time) / (p2.time - p1.time)
+				return lerpColor(p1.color, p2.color, localT)
+			end
+		end
+		return rgbSequence[#rgbSequence].color 
+	end
+
+	
+	local targetPercent = (value - min) / (max - min)
+	local progressCap = Instance.new("Frame")
+	progressCap.Size = UDim2.new(0, 10.8, 0, 10.8)
+	progressCap.AnchorPoint = Vector2.new(0.5, 0.5)
+	progressCap.BackgroundColor3 = getColorAtTime(targetPercent) 
+	progressCap.BorderSizePixel = 0
+	progressCap.Position = UDim2.new(targetPercent, 0, 0.5, 0)
+	progressCap.ZIndex = 5
+	progressCap.Parent = sliderBar
+
+	local capCorner = Instance.new("UICorner")
+	capCorner.CornerRadius = UDim.new(1, 0)
+	capCorner.Parent = progressCap
+
+	
+	local capGlow = Instance.new("ImageLabel")
+	capGlow.Size = UDim2.new(1.8, 0, 1.8, 0)
+	capGlow.Position = UDim2.new(0.5, 0, 0.5, 0)
+	capGlow.AnchorPoint = Vector2.new(0.5, 0.5)
+	capGlow.BackgroundTransparency = 1
+	capGlow.Image = "rbxassetid://200527618" 
+	capGlow.ImageTransparency = 0.4
+	capGlow.ZIndex = 4
+	capGlow.Parent = progressCap
+
+	
+	local percentLabel = Instance.new("TextLabel")
+	percentLabel.Size = UDim2.new(0, 50, 0, 20)
+	percentLabel.Position = UDim2.new(1, -60, 0, 5)
+	percentLabel.BackgroundTransparency = 1
+	percentLabel.TextColor3 = Color3.new(1, 1, 1)
+	percentLabel.Font = info.ValueFont or Enum.Font.Gotham
+	percentLabel.TextSize = info.ValueTextSize or 16
+	percentLabel.TextXAlignment = Enum.TextXAlignment.Right
+	percentLabel.Text = tostring(value)
+	percentLabel.Parent = container
+
+	
+	local dragging = false
+	local currentPercent = targetPercent
+	local smoothSpeed = 0.15
+
+	local function updateSliderFromX(inputX)
+		local relX = math.clamp(inputX - sliderBar.AbsolutePosition.X, 0, sliderBar.AbsoluteSize.X)
+		local percent = relX / sliderBar.AbsoluteSize.X
+		targetPercent = math.clamp(percent, 0, 1)
+		value = math.floor(targetPercent * (max - min) + min + 0.5)
+		if callback then
+			callback(value)
+		end
+	end
+
+	
+	sliderBar.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			updateSliderFromX(input.Position.X)
+		end
+	end)
+
+	
+	UserInputService.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = false
+		end
+	end)
+
+	RunService.RenderStepped:Connect(function()
+		if dragging then
+			local mousePos = UserInputService:GetMouseLocation()
+			updateSliderFromX(mousePos.X)
+		end
+	end)
+
+	RunService.RenderStepped:Connect(function(dt)
+		currentPercent = currentPercent + (targetPercent - currentPercent) * math.min(dt / smoothSpeed, 1)
+
+		fadedOverlay.Size = UDim2.new(1 - currentPercent, 0, 1, 0)
+		fadedOverlay.Position = UDim2.new(currentPercent, 0, 0, 0)
+
+		progressCap.Position = UDim2.new(currentPercent, 0, 0.5, 0)
+		progressCap.BackgroundColor3 = getColorAtTime(currentPercent) 
+
+		percentLabel.Text = tostring(math.floor(currentPercent * (max - min) + min))
+	end)
+
+	table.insert(tab.Buttons, container)
+	return container
+end
+
+function Window:ApplyTheme(themeName)
+    local theme = Themes[themeName]
+    if not theme then return end
+
+    self.CurrentTheme = theme
+
+    self.Frame.BackgroundColor3 = theme.Background
+    self.TopBar.BackgroundColor3 = theme.TopBar
+    self.TabBar.BackgroundColor3 = theme.TabBar
+
+    self.CloseButton.TextColor3 = theme.Text
+    self.SearchButton.TextColor3 = theme.Text
+    self.SearchBox.BackgroundColor3 = theme.Button
+    self.SearchBox.TextColor3 = theme.Text
+
+    for _, tab in ipairs(self.Tabs) do
+        tab.Button.BackgroundColor3 = theme.TabBar
+        tab.Button.TextColor3 = theme.Text
+        tab.ScrollFrame.BackgroundColor3 = theme.Background
+
+        for _, element in ipairs(tab.Buttons) do
+            if element:IsA("TextButton") then
+                element.BackgroundColor3 = theme.Button
+                element.TextColor3 = theme.Text
+            elseif element:IsA("Frame") then
+                element.BackgroundColor3 = theme.Button
+                local label = element:FindFirstChildOfClass("TextLabel")
+                if label then
+                    label.TextColor3 = theme.Text
+                end
+                local toggleFrame = element:FindFirstChildWhichIsA("Frame")
+                if toggleFrame and toggleFrame:IsA("Frame") then
+                    toggleFrame.BackgroundColor3 = theme.ToggleOff
+                    local toggleCircle = toggleFrame:FindFirstChildWhichIsA("Frame")
+                    if toggleCircle then
+                        toggleCircle.BackgroundColor3 = Color3.new(1, 1, 1)
+                    end
+                end
+            end
+        end
+    end
+end
+
+function tab:CreatePlayerBox()
+    local player = game.Players.LocalPlayer
+    if not player then
+        warn("LocalPlayer not found")
+        return
+    end
+
+    local box = Instance.new("Frame")
+    box.Size = UDim2.new(1, 0, 0, 150)
+    box.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    box.ClipsDescendants = true
+    box.Parent = tab.ScrollFrame
+
+    local boxCorner = Instance.new("UICorner")
+    boxCorner.CornerRadius = UDim.new(0, 6)
+    boxCorner.Parent = box
+
+   
+    local displayNameLabel = Instance.new("TextLabel")
+    displayNameLabel.Size = UDim2.new(1, -130, 0, 40)
+    displayNameLabel.Position = UDim2.new(0, 20, 0, 30)
+    displayNameLabel.BackgroundTransparency = 1
+    displayNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    displayNameLabel.Font = Enum.Font.SourceSansBold
+    displayNameLabel.TextSize = 36
+    displayNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    displayNameLabel.Text = "Welcome, " .. player.DisplayName
+    displayNameLabel.Parent = box
+
+   
+    local usernameLabel = Instance.new("TextLabel")
+    usernameLabel.Size = UDim2.new(1, -130, 0, 30)
+    usernameLabel.Position = UDim2.new(0, 30, 0, 65)
+    usernameLabel.BackgroundTransparency = 1
+    usernameLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+    usernameLabel.Font = Enum.Font.SourceSans
+    usernameLabel.TextSize = 20
+    usernameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    usernameLabel.Text = "@" .. player.Name
+    usernameLabel.Parent = box
+
+   
+    local borderThickness = 1
+    local pfpBorder = Instance.new("Frame")
+    pfpBorder.Size = UDim2.new(0, 100, 0, 100)
+    pfpBorder.Position = UDim2.new(1, -120, 0.5, -50)
+    pfpBorder.BackgroundColor3 = Color3.new(1, 1, 1)
+    pfpBorder.Parent = box
+    pfpBorder.ClipsDescendants = true
+
+    local borderCorner = Instance.new("UICorner")
+    borderCorner.CornerRadius = UDim.new(1, 0)
+    borderCorner.Parent = pfpBorder
+
+    local pfpImage = Instance.new("ImageLabel")
+    pfpImage.Size = UDim2.new(1, -borderThickness * 2, 1, -borderThickness * 2)
+    pfpImage.Position = UDim2.new(0, borderThickness, 0, borderThickness)
+    pfpImage.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    pfpImage.BackgroundTransparency = 0
+    pfpImage.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=150&height=150&format=png"
+    pfpImage.Parent = pfpBorder
+
+    local pfpCorner = Instance.new("UICorner")
+    pfpCorner.CornerRadius = UDim.new(1, 0)
+    pfpCorner.Parent = pfpImage
+
+   
+    local tooltipGui = Instance.new("ScreenGui")
+    tooltipGui.Name = "utopia.tooltip"
+    tooltipGui.ResetOnSpawn = false
+    tooltipGui.IgnoreGuiInset = true
+    tooltipGui.DisplayOrder = 999999999
+    tooltipGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+    tooltipGui.Parent = gethui and gethui() or game:GetService("CoreGui")
+
+   
+    local tooltipLabel = Instance.new("TextLabel")
+    tooltipLabel.Text = ""  
+    tooltipLabel.Size = UDim2.new(0, 240, 0, 40)
+    tooltipLabel.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    tooltipLabel.TextColor3 = Color3.new(1, 1, 1)
+    tooltipLabel.TextSize = 16
+    tooltipLabel.Font = Enum.Font.SourceSans
+    tooltipLabel.BackgroundTransparency = 0.1
+    tooltipLabel.TextXAlignment = Enum.TextXAlignment.Center
+    tooltipLabel.TextYAlignment = Enum.TextYAlignment.Center
+    tooltipLabel.Visible = false
+    tooltipLabel.Parent = tooltipGui
+
+    local tooltipCorner = Instance.new("UICorner")
+    tooltipCorner.CornerRadius = UDim.new(0, 6)
+    tooltipCorner.Parent = tooltipLabel
+
+   
+    local userInput = game:GetService("UserInputService")
+    local runService = game:GetService("RunService")
+    local moveConnection
+
+    pfpImage.MouseEnter:Connect(function()
+        tooltipLabel.Text = player.DisplayName .. " (@" .. player.Name .. ")"
+        tooltipLabel.Visible = true
+        moveConnection = runService.RenderStepped:Connect(function()
+            local mousePos = userInput:GetMouseLocation()
+            tooltipLabel.Position = UDim2.new(0, mousePos.X + 10, 0, mousePos.Y - 40)
+        end)
+    end)
+
+    pfpImage.MouseLeave:Connect(function()
+        tooltipLabel.Visible = false
+        if moveConnection then
+            moveConnection:Disconnect()
+            moveConnection = nil
+        end
+    end)
+
+   
+    tab.PlayerBoxBorder = pfpBorder
+    tab.Boxes = tab.Boxes or {}
+    table.insert(tab.Boxes, box)
+
+    return box
+end
+
+    return tab
+end
+
+local TweenService = game:GetService("TweenService")
+
+function Window:SelectTab(index)
+    local theme = self.CurrentTheme or Themes.Dark
+
+    for i, tab in ipairs(self.Tabs) do
+        local selected = (i == index)
+        local btn = tab.Button
+
+       
+        local underline = btn:FindFirstChild("Underline")
+        if underline then
+            underline.Visible = false
+           
+            underline.Size = UDim2.new(0, 0, 0, 1)
+        end
+
+       
+        tab.ScrollFrame.Visible = selected
+
+        if selected then
+           
+            if not underline then
+            local TweenService = game:GetService("TweenService")
+
+            underline = Instance.new("Frame")
+            underline.Name = "Underline"
+            underline.Size = UDim2.new(0, 0, 0, 1)
+            underline.Position = UDim2.new(0, 0, 1, -3)
+            underline.BackgroundColor3 = Color3.fromRGB(39, 160, 240)
+            underline.BackgroundTransparency = 1  
+            underline.BorderSizePixel = 0
+            underline.Parent = btn
+
+            task.delay(2.8, function()
+                local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                local goals = {
+                    BackgroundTransparency = 0
+                }
+                local tween = TweenService:Create(underline, tweenInfo, goals)
+                tween:Play()
+            end)
+            end
+
+            underline.Visible = true
+
+           
+            local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+            local goal = {Size = UDim2.new(1, 0, 0, 1)}
+            TweenService:Create(underline, tweenInfo, goal):Play()
+        else
+            btn.BackgroundColor3 = theme.TabBar
+        end
+    end
+end
+
+local myWindow = Window.new(Vector2.new(600, 400))
+return myWindow
